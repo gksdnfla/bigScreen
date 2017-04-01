@@ -107,7 +107,6 @@
 				}
 				createData = function(){
 					ajax({
-						type : 'post',
 						url : 'data/barrage.json',
 						data : {
 							num : '10'
@@ -272,7 +271,6 @@
 						function createLottery(arr){
 							var valueArray=[];
 							ajax({
-								type : "post",
 								url : "data/employ.json",
 								async : false,
 								success: function(json){
