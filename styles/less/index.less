@@ -1,0 +1,113 @@
+body {
+	overflow-x:hidden;
+	background:url(../../statics/images/indexBg.jpg) no-repeat 50% 0;
+	background-color:#000;
+}
+.barrage {
+	width:100%;
+	height:186px;
+}
+.barrage span {
+	height:66px;
+	font:bold 24px/66px "Microsoft yahei";
+	padding-left:74px;
+	float:left;
+	position:relative;
+}
+.barrage span i{
+	width:64px;
+	height:64px;
+	border:1px solid #a6a6a6;
+	border-radius:10px;
+	background:#000;
+	position:absolute;
+	left:0;
+	top:0;
+}
+.barrage span.white {
+	color:#fff;
+	text-shadow:2px 0px 0px #000,-2px 0px 0px #000,0px 2px 0px #000,0px -2px 0px #000; 
+}
+.barrage span.red {
+	color:#fc0300;
+}
+.barrage span.blue {
+	color:#0e30a6;
+}
+
+.lotteryBox {
+	width:100%;
+	height:100%;
+	background:url(../../statics/images/auto.jpg) no-repeat 50% 0;
+	display:none;
+	position:fixed;
+	top:0;
+	left:0;
+	.title {
+		width:694px;
+		height:122px;
+		background:url(../../statics/images/title.png) no-repeat;
+		margin:290px auto 0;
+		font:bold 70px/107px "Microsoft yahei";
+		text-align:center;
+		color:#fbd73b;
+	}
+	.content {
+		padding-top:22px;
+		width:1200px;
+		height:480px;
+		margin:0 auto;
+		.list {
+			width:1200px;
+			height:480px;
+			margin:0 auto;
+			float:left;
+			margin-left:20px;
+			li {
+				width:100%;
+				height:72px;
+				font:bold 28px/72px "Microsoft yahei";
+				text-align:center;
+				background-color:#fee170;
+				color:#b34304;
+				margin:20px auto 0;
+				overflow:hidden;
+				position:relative;
+				.lottery {
+					width:100%;
+					height:100%;
+					position:absolute;
+					top:0;
+					left:0;
+				}
+			}
+		}
+	}
+	button {
+		width:260px;
+		height:110px;
+		font:bold 48px/110px "Microsoft yahei";
+		text-align:center;
+		background:url(../../statics/images/button.png) no-repeat;
+		color:#b24306;
+		border:none;
+		outline:none;
+		display:block;
+		margin:40px auto 0;
+	}
+}
+#window {
+	.title {
+		height:40px;
+		background:#000;
+		font:18px/40px "Microsoft yahei";
+		color:#fff;
+		text-indent:20px;
+	}
+	.content {
+		height:360px;
+		font:18px/360px "Microsoft yahei";
+		color:#373432;
+		text-align:center;
+	}
+}

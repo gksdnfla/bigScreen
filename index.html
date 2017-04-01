@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>斐讯年会抽奖</title>
+	<link rel="stylesheet" href="styles/css/common.css"/>
+	<link rel="stylesheet" href="styles/css/index.css"/>
+	<script id="lotteryTemplate" type="text/HTML">
+		<div id="lotteryTitle" class="title"><%= title %></div>
+		<div class="content clearfix">
+			<% for(var j=0;j<col;j++){ %>
+			<ul class="list" style="width:<%= width %>px;">
+				<% for(var i=j*5; i<((j+1)*5>length ? length : (j+1)*5); i++){ %>
+				<li style="height:<%= col==1 ? height : '72' %>px;line-height:<%= col==1 ? height:'72' %>px;"><div id="lottery<%= i %>" class="lottery">************</div></li>
+				<% } %>
+			</ul>
+			<% } %>
+		</div>
+		<button id="btn">抽奖</button>
+	</script>
+	<script id="error" type="text/HTML">
+		<div class="title"><%= title %></div>
+		<div class="content">
+			<%= hint %>
+		</div>
+	</script>
+</head>
+<body>
+	<div id="barrage" class="barrage">
+	</div>
+	<div id="lotteryBox" class="lotteryBox">
+	</div>
+	<script type="text/JavaScript" src="scripts/template-native.js"></script>
+	<script type="text/JavaScript" src="scripts/ajax.js"></script>
+	<script type="text/JavaScript" src="scripts/Lottery.js"></script>
+	<script>
+		(function(){
+			var aColor = ['#02df12','#fff600','#ff1e00','#e21497','#0a8dd9'];
+			var windowSize = {width:document.documentElement.clientWidth,height:document.documentElement.clientHeight};
+			var oBarrage = document.getElementById('barrage');
+			var barrageSpeed = 3;
+			var barrageCheck = false;
+			var barrageEnd = false;
+			var errorHintCheck = false;
+			var createData = null;
+			window.addEventListener('resize',function(){
+				windowSize.width = document.documentElement.clientWidth;
+				windowSize.height = document.documentElement.clientHeight;
+			},false);
+
+			/* 弹幕 */
+			(function(){
+				window.addEventListener('keyup',function changeSpeed(ev){
+					switch(ev.keyCode){
+						case 37:
+							barrageSpeed++;
+							barrageSpeed = barrageSpeed>10 ? 10 : barrageSpeed;
+							if(barrageSpeed > 10){
+								barrageSpeed = 10;
+							}
+							break;
+						case 39:
+							barrageSpeed--;
+							if(barrageSpeed < 3){
+								barrageSpeed = 3;
+							}
+							break;
+					}
+				},false);
+				function playBarrage(aObj){
+					barrageEnd = false;
+					var check = true;
+					var maxWidthIndex = aObj[0].offsetWidth>aObj[1].offsetWidth ? 0 : 1;
+					window.addEventListener('keyup',setSpeed,false);
+					for(var i=0;i<aObj.length;i++){
+						(function(index){
+							aObj[index].timer = window.setInterval(function(){
+								aObj[index].x += aObj[index].speed;
+								aObj[index].style.transform = 'translateX(' + -aObj[index].x + 'px)';
+								if(aObj[index].x > aObj[index].offsetWidth && check && index == maxWidthIndex){
+									check = false;
+									barrageEnd = true;
+									if(!barrageCheck){
+										createData();
+									}
+								}
+								if(aObj[index].x > windowSize.width + aObj[index].offsetWidth){
+									window.clearInterval(aObj[index].timer);
+									oBarrage.removeChild(aObj[index]);
+									window.removeEventListener('keyup',setSpeed,false);
+								}
+							},30);
+						})(i);
+					}
+					function setSpeed(ev){
+						switch(ev.keyCode){
+							case 37:
+							case 39:
+								for(var i=0;i<aObj.length;i++){
+									if(aObj[i]){
+										aObj[i].speed = barrageSpeed;
+									}
+								}
+								break;
+						}
+					}
+				}
+				createData = function(){
+					ajax({
+						type : 'post',
+						url : 'data/barrage.json',
+						data : {
+							num : '10'
+						},
+						success : function(str){
+							var array = eval('('+str+')');
+							if(array.length > 0){
+								createEle(array);
+							}
+							else{
+								window.setTimeout(function(){
+									createData();
+								},3000);
+							}
+						}
+					});
+				}
+				createData();
+				function createEle(arr){
+					var oDivU = document.createElement('div');
+					var oDivD = document.createElement('div');
+					var children = [];
+					oDivU.style.position = 'absolute';
+					oDivD.style.position = 'absolute';
+					oDivU.style.top = '10px';
+					oDivD.style.top = '96px';
+					oDivD.style.paddingLeft = '50px';
+					oBarrage.appendChild(oDivU);
+					oBarrage.appendChild(oDivD);
+					for(var i=0;i<arr.length;i++){
+						var oSpan = document.createElement('span');
+						oSpan.innerHTML = arr[i].workNo+' '+arr[i].empName+' : '+arr[i].content;
+						oSpan.style.color = aColor[rnd(0,aColor.length)];
+						oSpan.style.textShadow = '0px 2px 2px rgba(0,0,0,1)';
+						if(i%2){
+							oDivD.appendChild(oSpan);
+						}
+						else{
+							oDivU.appendChild(oSpan);
+						}
+						children.push(oSpan);
+						oSpan.style.paddingRight = rnd(50,200)+'px';
+					}
+					oDivU.speed = barrageSpeed;
+					oDivU.x = 0;
+					oDivD.speed = barrageSpeed;
+					oDivD.x = 0;
+					setWidth(oDivU);
+					setWidth(oDivD);
+					oDivU.style.right = -oDivU.offsetWidth + 'px';
+					oDivD.style.right = -oDivD.offsetWidth + 'px';
+					playBarrage([oDivU,oDivD]);
+
+					function setWidth(obj){
+						var width = 0;
+						for(var i=0;i<obj.children.length;i++){
+							width += obj.children[i].offsetWidth;
+						}
+						obj.style.width = width + 50 + 'px';
+					}
+				}
+			})();
+
+			/* 抽奖 */
+			(function(){
+				var viewCheck = false;
+				var aLottery = [];
+				/* 获取快捷键 */
+				ajax({
+					url : 'data/key.json',
+					//data:{"meetingName":"1"},
+					success : function(json){
+						var data = eval('('+json+')');
+						for(var i=0;i<data.length;i++){
+							aLottery[i] = {
+								title : data[i].name,
+								key : data[i].option,
+								length : data[i].amount,
+								viewLottery : viewLottery,
+								arr : [],
+								firstCheck : false,
+								viewCheck : false
+							};
+						}
+						window.addEventListener('keyup',function(ev){
+							for(var i=0;i<aLottery.length;i++){
+								if(aLottery[i].key.toUpperCase() == String.fromCharCode(ev.keyCode)){
+									if(checkView()){
+										if(!aLottery[i].firstCheck){
+											aLottery[i].viewLottery();
+											aLottery[i].viewCheck = true;
+										}
+										else{
+											if(!errorHintCheck){
+												errorHint();
+											}
+										}
+										document.querySelector('#lotteryBox').style.background = 'url(statics/images/auto.jpg) no-repeat 50% 0)';
+									}
+									return;
+								}
+							}
+							if(ev.keyCode  == 27 ){
+								errorHintCheck = false;
+								barrageCheck = false;
+								for(var i=0;i<aLottery.length;i++){
+									aLottery[i].viewCheck = false;
+								}
+								if(document.querySelector('.hintWindow')){
+									document.querySelector('body').removeChild(document.querySelector('.hintWindow'));
+								}
+								document.querySelector('#lotteryBox').style.display = 'none';
+								if(barrageEnd){
+									createData();
+								}
+							}
+						},false);
+						function checkView(){
+							for(var i=0;i<aLottery.length;i++){
+								if(aLottery[i].viewCheck){
+									return false;
+								}
+							}
+							return true;
+						}
+					}
+				});
+				function viewLottery(){
+					/* 弹幕停止 */
+					barrageCheck = true;
+
+					var lotteryData = {
+						title : this.title,
+						arr : [],
+						length : parseInt(this.length)
+					};
+					var _this = this;
+					var aLotteryMove = [];
+					lotteryData.col = Math.ceil(lotteryData.length/5);
+					lotteryData.col = lotteryData.col==0 ? 1 : lotteryData.col;
+					lotteryData.width = (1200-(lotteryData.col+1)*20)/lotteryData.col;
+					lotteryData.height = (480-parseInt(lotteryData.length+1)*20)/lotteryData.length;
+					document.querySelector('#lotteryBox').style.display = 'block';
+					document.querySelector('#lotteryBox').innerHTML = template('lotteryTemplate',lotteryData);
+					var oBtn = document.getElementById('btn');
+					oBtn.playCheck = true;
+					oBtn.stopCheck = false;
+					/* 点击抽奖 */
+					oBtn.onclick = function(){
+						window.moving();
+					}
+					window.moving = function(){
+						if(oBtn.playCheck){
+							/* 获取数据 */
+							var aSelectedWorker = createLottery();
+						}
+						else{
+							playAndStop.call(_this);
+							oBtn.innerHtml="抽奖";
+						}
+						
+						function createLottery(arr){
+							var valueArray=[];
+							ajax({
+								type : "post",
+								url : "data/employ.json",
+								async : false,
+								success: function(json){
+									var data = eval('('+json+')');
+									for(var i=0;i<data.length;i++){
+										valueArray[i] = data[i].workNo + ' ' + data[i].empName;
+									}
+									for(var i=0;i<lotteryData.length;i++){
+										aLotteryMove.push(new ScrolledAnimation({
+											compId : 'lottery'+i,
+											length : 30,
+											selectedIndex : valueArray.length/2,
+											valueArray : valueArray,
+											background : '#fee170',
+											lotteryTitle : lotteryData.title,
+											index : i
+										}));
+									}
+									playAndStop.call(_this);
+								}
+							});
+						}
+
+
+						function playAndStop(){
+							var timer = null;
+							if(oBtn.playCheck){
+								oBtn.innerHTML = '停止';
+								oBtn.playCheck = false;
+								for(var i=0;i<lotteryData.length;i++){
+									aLotteryMove[i].start();
+								}
+								window.setTimeout(function(){
+									oBtn.stopCheck = true;
+								},1000);
+							}
+							else{
+								if(oBtn.stopCheck){
+									this.firstCheck = true;
+									// 获取中奖名单
+									var prizeList = [];
+									ajax({
+										type : 'post',
+										url : 'data/getPrize.json',
+										data : {
+											prizeName : document.querySelector('#lotteryTitle').innerHTML
+										},
+										success : function(arr){
+											var data = eval(arr);
+											if(data){
+												for(var i=0;i<data.length;i++){
+													prizeList.push(data[i].workNo + ' ' +data[i].empName);
+												}
+											}
+											oBtn.stopCheck = false;
+											for(var i=0;i<lotteryData.length;i++){
+												aLotteryMove[i].stop(prizeList);
+											}
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+			})();
+			function rnd(min,max){
+				return parseInt(Math.random()*(max-min))+min;
+			}
+			function errorHint(status){
+				var oWindowBg = document.createElement('div');
+				var oWindow = document.createElement('div');
+				errorHintCheck = true;
+				oWindowBg.className = 'hintWindow';
+				setStyle(oWindowBg,{
+					width : '100%',
+					height : '100%',
+					background : 'rgba(0,0,0,.5)',
+					position : 'fixed',
+					top : '0',
+					left : '0'
+				});
+				setStyle(oWindow,{
+					width : '500px',
+					height : '400px',
+					background : '#fff',
+					position : 'absolute',
+					left : '50%',
+					top : '50%',
+					transform : 'translate(-50%,-50%)'
+				});
+				oWindow.id = 'window';
+				oWindow.innerHTML = template('error',{title:'提示',hint:'已抽过奖！'});
+				oWindowBg.appendChild(oWindow);
+				document.querySelector('body').appendChild(oWindowBg);
+				oWindowBg.onclick = function(){
+					document.querySelector('body').removeChild(oWindow);
+					document.querySelector('body').removeChild(oWindowBg);
+					errorHintCheck = true;
+				}
+				function setStyle(obj,json){
+					for(key in json){
+						obj.style[key] = json[key];
+					}
+				}
+			}
+		})();
+		/* 抽奖开始停止 */
+		window.addEventListener('keyup',function(ev){
+			switch(ev.keyCode){
+				case 32:
+				case 13:
+				case 33:
+				case 34:
+					window.moving && window.moving();
+					break;
+			}
+		},false);
+		/* 禁止滚动 */
+		if(navigator.userAgent.toLowerCase().indexOf('firefox')!=-1){
+			document.addEventListener('DOMMouseScroll',scroll,false);
+		}
+		else{
+			document.onmousewheel=scroll;
+		}
+		function scroll(ev){
+			var oEvent= ev || window.event;
+			oEvent.preventDefault&&oEvent.preventDefault();
+			return false;
+		}
+	</script>
+</body>
+</html>

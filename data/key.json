@@ -1,0 +1,32 @@
+[
+	{
+		"amount"	: "3",
+		"name"		: "一等奖-A轮",
+		"option"	: "a",
+		"background": "statics/images/auto.jpg"
+	},
+	{
+		"amount"	: "2",
+		"name"		: "一等奖-B轮",
+		"option"	: "b",
+		"background": "statics/images/auto.jpg"
+	},
+	{
+		"amount"	: "5",
+		"name"		: "二等奖-A轮",
+		"option"	: "c",
+		"background": "statics/images/auto.jpg"
+	},
+	{
+		"amount"	: "5",
+		"name"		: "二等奖-B轮",
+		"option"	: "d",
+		"background": "statics/images/auto.jpg"
+	},
+	{
+		"amount"	: "20",
+		"name"		: "三等奖-B轮",
+		"option"	: "e",
+		"background": "statics/images/auto.jpg"
+	}
+]
