@@ -1,4 +1,7 @@
 # 年会抽奖
+
+url: [gksdnfla.github.io/bigScreen/](gksdnfla.github.io/bigScreen/)
+
 ←和→ 可以加快弹幕的速度
 
 a,b,c,d,e 可以打开抽奖窗口
