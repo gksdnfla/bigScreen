@@ -1,6 +1,6 @@
 # 年会抽奖
 
-url: [gksdnfla.github.io/bigScreen/](gksdnfla.github.io/bigScreen/)
+url: [https://gksdnfla.github.io/bigScreen/](https://gksdnfla.github.io/bigScreen/)
 
 ←和→ 可以加快弹幕的速度
 
